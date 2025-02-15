@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e  # Skript bei Fehlern abbrechen
 
+sudo apt install python3
+apt install python3.10-venv
+
 # 1. Python Virtual Environment erstellen und aktivieren
 echo "Erstelle Python-venv..."
 python3 -m venv venv
@@ -15,9 +18,11 @@ pip install open-webui
 echo "Installiere Ollama..."
 curl -fsSL https://ollama.com/install.sh | sh
 
+ollama pull llama3.2:1b
+
 # 3. Llama2 über Ollama starten (im Hintergrund)
-echo "Starte Ollama mit llama2:13b..."
-ollama run llama2:13b &
+echo "Starte Ollama mit deepseek-r1:1.5b..."
+ollama run deepseek-r1:1.5b &
 OLLAMA_PID=$!
 
 # Kurze Pause, um Ollama Zeit zum Starten zu geben
@@ -34,7 +39,7 @@ echo "Warte auf die Initialisierung von open-webui..."
 sleep 5
 
 # 5. Browser öffnen (Linux: xdg-open, macOS: open)
-URL="http://127.0.0.1:5000"
+URL="http://127.0.0.1:8080"
 if command -v xdg-open >/dev/null 2>&1; then
     echo "Öffne Browser mit $URL ..."
     xdg-open "$URL"
