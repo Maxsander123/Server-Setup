@@ -2,7 +2,7 @@
 set -e  # Skript bei Fehlern abbrechen
 
 sudo apt install python3
-apt install python3.10-venv
+apt install python3-venv
 
 # 1. Python Virtual Environment erstellen und aktivieren
 echo "Erstelle Python-venv..."
