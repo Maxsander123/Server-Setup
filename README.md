@@ -9,7 +9,6 @@ Contents
     Prerequisites
     Quick Start
     Usage
-    Folder Structure
     Contributing
     License
     Contact
