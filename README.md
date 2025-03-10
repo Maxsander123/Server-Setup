@@ -1,11 +1,13 @@
 Server-Setup
 
-A collection of scripts, configuration files, and instructions for quickly setting up and configuring a server. This repository is intended to streamline the process of deploying a new server with common tools, packages, and security best practices.
-Table of Contents
+A one-stop solution for automating the initial configuration of a new Linux server. These scripts streamline the process of installing packages, configuring services, and enhancing server security.
+
+(Replace this image link or remove it if you don’t have a relevant image!)
+Contents
 
     Features
     Prerequisites
-    Installation
+    Quick Start
     Usage
     Folder Structure
     Contributing
@@ -14,50 +16,62 @@ Table of Contents
 
 Features
 
-    Automated Setup: Quickly install and configure necessary packages and dependencies (e.g., Nginx, Apache, Docker, etc.).
-    Security Hardened: Includes basic firewall rules, SSH configurations, and other security best practices.
-    Easily Customizable: Flexible scripts that can be tweaked to match your application’s requirements.
-    Repeatable Environment: Avoid “works-on-my-machine” issues by standardizing server setup steps.
+    Automated Setup: Install essential packages (like Docker, Nginx, and more) with a single command.
+    Secure Defaults: Includes firewall rules, SSH hardening, and other basic security best practices.
+    Easy Configuration: All config files are neatly organized, making them simple to customize.
+    Time-Saving: Avoid repetitive manual steps each time you set up a new server.
 
 Prerequisites
 
-    A fresh installation of your preferred Linux distribution (e.g., Ubuntu, Debian, CentOS).
-    Root or sudo privileges on the server.
-    Installed utilities such as curl, wget, and git (depending on which scripts you plan to run).
+    Linux server (e.g., Ubuntu, Debian, CentOS).
+    Sudo or Root privileges.
+    Basic command-line utilities (e.g., curl, wget, git).
 
-Installation
+Quick Start
 
     Clone the Repository:
 
 git clone https://github.com/Maxsander123/Server-Setup.git
 cd Server-Setup
 
-Review Scripts: Familiarize yourself with the scripts and their contents. It's good practice to confirm you trust each script before execution.
+(Optional) Make Scripts Executable:
 
-Make Scripts Executable (if needed):
+chmod +x scripts/*.sh
 
-    chmod +x ./scripts/*.sh
+Run the Setup:
+
+    ./scripts/setup.sh
+
+    That’s it! This script typically handles installing updates, configuring firewalls, setting SSH preferences, and more.
 
 Usage
 
-    Run the Main Setup Script (example command, depends on how you’ve structured the scripts):
+    Primary Script
+        setup.sh: Installs core packages and applies fundamental security measures.
 
 ./scripts/setup.sh
 
-This script will install common packages, configure the firewall, set up SSH key authentication, and perform other tasks listed in its documentation or comments.
+Additional Scripts
 
-Check the Logs/Output: Keep an eye on the console output (and any log files) for errors or additional instructions.
+    install_docker.sh: Installs and configures Docker.
+    setup_web_server.sh: Installs and configures Nginx or Apache.
 
-Optional Scripts: Some scripts may be optional or specific to certain use cases, such as install_docker.sh, setup_web_server.sh, etc. Use them as needed:
+./scripts/install_docker.sh
+./scripts/setup_web_server.sh
 
-    ./scripts/install_docker.sh
-    ./scripts/setup_web_server.sh
+Configuration Files
 
-    Customize Configuration: Adjust configuration files in the configs folder as desired (e.g., changing Nginx or Apache settings, SSH ports, and more).
+    Modify any default configs (e.g., nginx.conf, apache.conf, sshd_config) within the configs/ folder to suit your needs:
+
+    nano configs/nginx.conf
+
+    Verify
+        Keep an eye on the console output for any warnings or instructions.
+        Consult your server logs if something doesn’t go as expected.
 
 Folder Structure
 
-Below is a general overview of the folder structure. Adapt this section based on your actual layout:
+Here’s an overview of the repository layout:
 
 Server-Setup/
 ├── configs/
@@ -71,37 +85,36 @@ Server-Setup/
 │   ├── setup_web_server.sh
 │   └── ...
 ├── LICENSE
-├── README.md
-└── ...
+└── README.md
 
-    configs/: Contains sample or default configuration files for various services (e.g., web server, SSH, firewall).
-    scripts/: Shell scripts that handle installing packages, updating configurations, and generally automating the server setup process.
+    configs/: Contains example or default configuration files for various services.
+    scripts/: Houses the main setup scripts used to automate installations and configurations.
 
 Contributing
 
-Contributions are welcome! Here’s how you can help:
+Contributions are welcome! To propose changes:
 
-    Fork the Project.
-    Create a Feature Branch:
+    Fork the repository.
+    Create a new branch:
 
-git checkout -b feature/some-improvement
+git checkout -b feature/my-improvement
 
-Commit Your Changes:
+Make your changes and commit them:
 
-git commit -m "Add some improvement"
+git commit -m "Add feature or fix bug"
 
-Push to the Branch:
+Push to GitHub:
 
-    git push origin feature/some-improvement
+    git push origin feature/my-improvement
 
-    Open a Pull Request.
+    Open a Pull Request on this repository.
 
-Please provide a clear description of any changes and testing steps.
 License
 
-This project is licensed under the MIT License. You’re free to use, modify, and distribute this software as long as the original license is included.
+This project is licensed under the MIT License. Feel free to modify and use these scripts according to your needs.
 Contact
 
-If you have any questions, suggestions, or want to report an issue, feel free to open an issue or reach out:
+For any questions, improvements, or bugs, please:
 
-    Author: Maxsander123
+    Open an issue on GitHub: Issues
+    Reach out to Maxsander123
