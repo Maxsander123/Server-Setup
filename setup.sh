@@ -30,12 +30,7 @@ apt autoremove -y && apt autoclean -y
 
 # Enable essential services
 echo "Enabling services..."
-systemctl enable --now ssh ufw fail2ban
-
-# Configure Firewall (UFW)
-echo "Setting up UFW firewall..."
-ufw allow OpenSSH
-ufw enable
+systemctl enable --now ssh fail2ban
 
 # Final message
 echo "Setup complete! Reboot recommended."
