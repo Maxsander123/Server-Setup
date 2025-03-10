@@ -29,10 +29,10 @@ Prerequisites
 
 Quick Start
 
-    Clone the Repository:
-
-git clone https://github.com/Maxsander123/Server-Setup.git
-cd Server-Setup
+Clone the Repository
+    
+    git clone https://github.com/Maxsander123/Server-Setup.git:
+    cd Server-Setup:
 
 (Optional) Make Scripts Executable:
 
