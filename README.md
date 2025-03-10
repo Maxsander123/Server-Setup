@@ -68,7 +68,7 @@ Push to GitHub:
 
     git push origin feature/my-improvement
 
-    Open a Pull Request on this repository.
+Open a Pull Request on this repository.
 
 License
 
@@ -77,5 +77,5 @@ Contact
 
 For any questions, improvements, or bugs, please:
 
-    Open an issue on GitHub: Issues
-    Reach out to Maxsander123
+Open an issue on GitHub: Issues
+Reach out to Maxsander123
