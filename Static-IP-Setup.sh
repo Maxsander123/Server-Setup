@@ -18,13 +18,13 @@ else
 fi
 
 # Backup any existing Netplan configuration (if present).
-if [ -f /etc/netplan/01-netcfg.yaml ]; then
+if [ -f /etc/netplan/50-netcfg.yaml ]; then
     sudo cp /etc/netplan/01-netcfg.yaml /etc/netplan/01-netcfg.yaml.bak
     echo "Existing configuration backed up to /etc/netplan/01-netcfg.yaml.bak"
 fi
 
 # Create new Netplan configuration.
-sudo bash -c "cat > /etc/netplan/01-netcfg.yaml" <<EOF
+sudo bash -c "cat > /etc/netplan/50-netcfg.yaml" <<EOF
 network:
   version: 2
   renderer: networkd
