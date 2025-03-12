@@ -1,10 +1,17 @@
 #!/bin/bash
 # Dieses Skript listet alle installierten Pakete inkl. ihrer Größe (in GB) auf, sortiert sie nach Größe absteigend 
-# und speichert das Ergebnis in einer Log-Datei im Verzeichnis /home/${USER}/.Packet-Logs/.
-# Die Log-Datei wird benannt als {Datum}-{Uhrzeit}-{Anzahl der Pakete}-{Ausführungszähler}.log
+# und speichert das Ergebnis in einer Log-Datei im Verzeichnis /home/<user>/.Packet-Logs/.
+# Die Log-Datei wird benannt als {Datum}-{Uhrzeit}-{Anzahl der Pakete}-{Ausführungszähler}-{ausführender Benutzer}.log
+
+# Ermitteln des tatsächlichen Benutzers: Falls mit sudo ausgeführt, dann $SUDO_USER verwenden
+if [ -n "$SUDO_USER" ]; then
+    actual_user="$SUDO_USER"
+else
+    actual_user="$USER"
+fi
 
 # Zielverzeichnis festlegen und erstellen, falls nicht vorhanden
-LOG_DIR="/home/${USER}/.Packet-Logs"
+LOG_DIR="/home/${actual_user}/.Packet-Logs"
 mkdir -p "$LOG_DIR"
 
 # Ausführungszähler verwalten: Zähler wird in einer versteckten Datei im Log-Verzeichnis gespeichert
@@ -25,8 +32,8 @@ uhrzeit=$(date +%H-%M-%S)
 package_count=$(dpkg-query -W -f='${Package}\n' | wc -l)
 package_count=$(echo "$package_count" | tr -d ' ')  # Entfernt etwaige Leerzeichen
 
-# Dateinamen gemäß Vorgabe zusammenstellen
-filename="${LOG_DIR}/${datum}-${uhrzeit}-${package_count}-${run_count}.log"
+# Dateinamen gemäß Vorgabe zusammenstellen, inkl. des ausführenden Benutzers
+filename="${LOG_DIR}/${datum}-${uhrzeit}-${package_count}-${run_count}-${actual_user}.log"
 
 # Ausgabe in die Log-Datei schreiben
 {
