@@ -1,12 +1,20 @@
 #!/bin/bash
-# Skript: run_bash_files.sh
+# Skript: Execute.sh
 
-# Suche alle Bash-Dateien (*.sh) im aktuellen Ordner
-sh_files=(*.sh)
+# Eigener Dateiname ermitteln
+script_name=$(basename "$0")
 
-# Falls keine Bash-Dateien gefunden werden, wird das Skript beendet.
+# Alle Bash-Dateien (*.sh) im aktuellen Ordner, außer der eigenen Datei, sammeln
+sh_files=()
+for file in *.sh; do
+    if [[ "$file" != "$script_name" ]]; then
+        sh_files+=("$file")
+    fi
+done
+
+# Falls keine passenden Bash-Dateien gefunden werden, Skript beenden.
 if [ ${#sh_files[@]} -eq 0 ]; then
-    echo "Keine Bash-Dateien im aktuellen Ordner gefunden."
+    echo "Keine Bash-Dateien (außer '$script_name') im aktuellen Ordner gefunden."
     exit 1
 fi
 
