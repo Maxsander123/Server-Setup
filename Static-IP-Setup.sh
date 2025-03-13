@@ -1,17 +1,19 @@
 #!/bin/bash
 
-# Prompt for network interface name; default to "ens3" if left empty.
-read -p "Enter the network interface name (e.g. ens3) [Default: ens3]: " interface
-interface=${interface:-ens3}
+# This script configures a static IP using Netplan
+# and uses dialog for a text-based GUI interface.
+
+# Prompt for network interface name with default "ens3"
+interface=$(dialog --inputbox "Enter the network interface name (e.g. ens3)" 8 40 "ens3" 3>&1 1>&2 2>&3 3>&-)
 
 # Prompt for static IPv4 configuration.
-read -p "Enter static IPv4 address (CIDR notation, e.g. 192.168.1.100/24): " ip_addr
-read -p "Enter Gateway (e.g. 192.168.1.1): " gateway
-read -p "Enter DNS server (e.g. 8.8.8.8): " dns
+ip_addr=$(dialog --inputbox "Enter static IPv4 address (CIDR notation, e.g. 192.168.1.100/24)" 8 60 3>&1 1>&2 2>&3 3>&-)
+gateway=$(dialog --inputbox "Enter Gateway (e.g. 192.168.1.1)" 8 40 3>&1 1>&2 2>&3 3>&-)
+dns=$(dialog --inputbox "Enter DNS server (e.g. 8.8.8.8)" 8 40 3>&1 1>&2 2>&3 3>&-)
 
 # Prompt for IPv6 activation.
-read -p "Enable IPv6? (y/n): " ipv6_choice
-if [[ "$ipv6_choice" =~ ^[Yy]$ ]]; then
+dialog --yesno "Enable IPv6?" 8 40
+if [ $? -eq 0 ]; then
     dhcp6_value="true"
 else
     dhcp6_value="false"
@@ -19,8 +21,8 @@ fi
 
 # Backup any existing Netplan configuration (if present).
 if [ -f /etc/netplan/50-netcfg.yaml ]; then
-    sudo cp /etc/netplan/01-netcfg.yaml /etc/netplan/01-netcfg.yaml.bak
-    echo "Existing configuration backed up to /etc/netplan/01-netcfg.yaml.bak"
+    sudo cp /etc/netplan/50-netcfg.yaml /etc/netplan/50-netcfg.yaml.bak
+    dialog --msgbox "Existing configuration backed up to /etc/netplan/50-netcfg.yaml.bak" 8 60
 fi
 
 # Create new Netplan configuration.
@@ -41,7 +43,7 @@ EOF
 # Apply the new Netplan configuration.
 sudo netplan apply
 
-echo "Static IP configuration applied. Testing connectivity..."
+dialog --msgbox "Static IP configuration applied. Testing connectivity..." 8 60
 
 # Ping 8.8.8.8 for 4 seconds.
 ping -w 4 8.8.8.8 > /dev/null 2>&1
@@ -52,7 +54,9 @@ ping -w 4 google.com > /dev/null 2>&1
 google_result=$?
 
 if [ $ipv4_result -eq 0 ] && [ $google_result -eq 0 ]; then
-    echo "everything works"
+    dialog --msgbox "Everything works" 8 40
 else
-    echo "Connectivity test failed."
+    dialog --msgbox "Connectivity test failed." 8 40
 fi
+
+clear
