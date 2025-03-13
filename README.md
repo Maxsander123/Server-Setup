@@ -33,14 +33,14 @@ Clone the Repository
     git clone https://github.com/Maxsander123/Server-Setup.git
     cd Server-Setup
 
-Make Scripts Executable:
- 
-    chmod +x scripts/*.sh
+Make all script executable
 
-Run the Setup:
+    chmod +x Execute.sh
 
-    ./scripts/setup.sh
+Choose what script should be executet
 
+    sudo ./Execute.sh
+    
 That’s it! This script typically handles installing updates, configuring firewalls, setting SSH preferences, and more.
 
 Usage
@@ -72,6 +72,7 @@ Open a Pull Request on this repository.
 License
 
 This project is licensed under the MIT License. Feel free to modify and use these scripts according to your needs.
+
 Contact
 
 For any questions, improvements, or bugs, please:
