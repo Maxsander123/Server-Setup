@@ -1,4 +1,14 @@
 #!/bin/bash
+# This script updates the system and lets you choose which category of tools to install.
+# It groups packages into:
+#   1) CLI & Utilities
+#   2) Network Tools
+#   3) Security & Monitoring Tools
+#   4) Development Tools
+#   5) Backup Tools
+#   6) All (installs every package)
+#
+# Run as root!
 
 # Ensure the script runs as root
 if [ "$EUID" -ne 0 ]; then
@@ -10,27 +20,94 @@ fi
 echo "Updating system..."
 apt update && apt upgrade -y
 
-# Install essential utilities
-echo "Installing essential tools..."
-apt install -y btop htop mc wget curl git unzip tar zip nano vim tmux screen software-properties-common \
-  build-essential net-tools ufw fail2ban rsync openssh-server sudo lsof ltrace strace gdb tcpdump \
-  sysstat iproute2 iputils-ping dnsutils traceroute whois nmap telnet socat iperf3 jq fzf ripgrep \
-  neofetch tree cron logrotate psmisc bash-completion sudo bash unzip locate gzip bzip2 \
-  apache2-utils aria2 ffmpeg pv ngrep multitail glances duf duff progress ncdu mtr zsh \
-  ca-certificates certbot python3-certbot-apache python3-certbot-nginx dnsmasq wireguard openvpn \
-  libssl-dev libffi-dev python3-pip python3-venv libapache2-mod-security2 clamav rkhunter \
-  smartmontools exfat-fuse exfat-utils syslog-ng logwatch monit supervisor fail2ban auditd \
-  iotop vnstat bmon iftop atop sysdig slurm logstash metricbeat filebeat packetbeat beats \
-  ethtool speedtest-cli vnstat glusterfs-client borgbackup restic duplicity nfs-common cifs-utils \
-  samba samba-client snmp snmpd snmp-mibs-downloader net-snmp nfs-kernel-server sshguard logcheck
+# Define package groups
+
+cli_tools=(
+  btop htop mc wget curl git unzip tar zip nano vim tmux screen software-properties-common
+  cron logrotate psmisc bash-completion locate gzip bzip2 aria2 ffmpeg pv multitail glances
+  duf duff progress ncdu neofetch tree fzf ripgrep zsh
+)
+
+network_tools=(
+  net-tools ufw rsync openssh-server lsof ltrace strace tcpdump sysstat iproute2 iputils-ping
+  dnsutils traceroute whois nmap telnet socat iperf3 speedtest-cli vnstat mtr iftop dnsmasq
+  wireguard openvpn samba samba-client snmp snmpd snmp-mibs-downloader net-snmp nfs-common
+  nfs-kernel-server cifs-utils
+)
+
+security_tools=(
+  fail2ban clamav rkhunter libapache2-mod-security2 auditd sshguard logcheck syslog-ng
+  logwatch monit supervisor certbot python3-certbot-apache python3-certbot-nginx
+)
+
+development_tools=(
+  build-essential libssl-dev libffi-dev python3-pip python3-venv gdb
+)
+
+backup_tools=(
+  borgbackup restic duplicity
+)
+
+# Display selection menu
+echo "Select the categories of tools to install:"
+echo "  1) CLI & Utilities"
+echo "  2) Network Tools"
+echo "  3) Security & Monitoring Tools"
+echo "  4) Development Tools"
+echo "  5) Backup Tools"
+echo "  6) All Tools"
+read -p "Enter your choices as comma-separated numbers (e.g. 1,3,5): " choices
+
+# Convert user input to an array (splitting on commas)
+IFS=',' read -ra selected <<< "$choices"
+
+# Initialize empty array for selected packages
+packages=()
+
+# Process each selected option
+for choice in "${selected[@]}"; do
+  # Remove any surrounding whitespace
+  choice=$(echo "$choice" | xargs)
+  case "$choice" in
+    1)
+      packages+=("${cli_tools[@]}")
+      ;;
+    2)
+      packages+=("${network_tools[@]}")
+      ;;
+    3)
+      packages+=("${security_tools[@]}")
+      ;;
+    4)
+      packages+=("${development_tools[@]}")
+      ;;
+    5)
+      packages+=("${backup_tools[@]}")
+      ;;
+    6)
+      packages+=("${cli_tools[@]}" "${network_tools[@]}" "${security_tools[@]}" "${development_tools[@]}" "${backup_tools[@]}")
+      # No need to check further choices if "All" is selected.
+      break
+      ;;
+    *)
+      echo "Invalid choice: $choice"
+      ;;
+  esac
+done
+
+# Remove duplicate package names by sorting uniquely
+unique_packages=($(printf "%s\n" "${packages[@]}" | sort -u))
+
+# Install selected packages
+echo "Installing selected packages..."
+apt install -y "${unique_packages[@]}"
 
 # Clean up
 echo "Cleaning up..."
 apt autoremove -y && apt autoclean -y
 
-# Enable essential services
-echo "Enabling services..."
+# Enable essential services (SSH and fail2ban)
+echo "Enabling essential services..."
 systemctl enable --now ssh fail2ban
 
-# Final message
-echo "Setup complete! Reboot recommended."
+echo "Setup complete! A reboot is recommended."
