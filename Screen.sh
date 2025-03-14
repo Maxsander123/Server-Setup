@@ -2,11 +2,11 @@
 # Dieses Skript installiert 'screen', falls nicht vorhanden, und bietet ein Menü
 # zur Verwaltung von Screen-Sessions in einer Proxmox VNC Umgebung.
 #
-# In jeder Screen-Session soll der Alias "Exscreen" gesetzt werden, der den Befehl
+# In jeder Screen-Session wird der Alias "Exscreen" gesetzt, der den Befehl
 # "screen -X detach" ausführt, um die Session zu verlassen und zum Skript zurückzukehren.
 #
-# Achtung: Das Einfügen des Aliases in bereits laufende Sessions erfolgt per "stuff".
-# Dies funktioniert nur, wenn die Shell tatsächlich Eingaben entgegennimmt.
+# Zusätzlich kann jetzt beim Erstellen oder Anhängen einer Session ein Timeout (in Minuten)
+# angegeben werden, nach dessen Ablauf die Session automatisch getrennt wird.
 
 # Root-Rechte prüfen
 if [[ $EUID -ne 0 ]]; then
@@ -46,10 +46,17 @@ while true; do
     case $option in
         1)
             read -p "Name der neuen Session: " session_name
+            read -p "Timeout in Minuten (0 für kein Timeout): " timeout_minutes
             echo "Starte neue Screen-Session: $session_name"
             # Erstelle eine temporäre RC-Datei, die den Exscreen-Alias enthält
             tmp_rc=$(mktemp)
             echo "alias Exscreen='screen -X detach'" > "$tmp_rc"
+            # Falls ein Timeout gesetzt wurde, starte einen Hintergrundprozess,
+            # der nach Ablauf des Zeitraums den detach-Befehl sendet.
+            if [ "$timeout_minutes" -gt 0 ]; then
+                timeout_seconds=$((timeout_minutes * 60))
+                ( sleep "$timeout_seconds" && screen -S "$session_name" -X detach ) &
+            fi
             # Starte eine neue bash-Shell mit diesem RC-File innerhalb der neuen Screen-Session
             screen -S "$session_name" bash --rcfile "$tmp_rc"
             rm "$tmp_rc"
@@ -64,6 +71,11 @@ while true; do
             read -p "Geben Sie den Namen oder die ID der Session ein, an die Sie anhängen möchten: " session_id
             # Versuche, den Alias in der bestehenden Session zu setzen
             set_exscreen_alias "$session_id"
+            read -p "Timeout in Minuten (0 für kein Timeout): " timeout_minutes
+            if [ "$timeout_minutes" -gt 0 ]; then
+                timeout_seconds=$((timeout_minutes * 60))
+                ( sleep "$timeout_seconds" && screen -S "$session_id" -X detach ) &
+            fi
             screen -r "$session_id"
             ;;
         4)
