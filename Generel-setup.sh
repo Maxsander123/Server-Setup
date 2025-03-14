@@ -1,26 +1,27 @@
 #!/bin/bash
-# This script updates the system and lets you choose which category of tools to install.
-# It groups packages into:
+# Dieses Skript aktualisiert das System und erlaubt die Auswahl, welche Kategorie von Tools installiert werden soll.
+# Es gruppiert Pakete in:
 #   1) CLI & Utilities
 #   2) Network Tools
 #   3) Security & Monitoring Tools
 #   4) Development Tools
 #   5) Backup Tools
-#   6) All (installs every package)
+#   6) Additional Tools (200+ extra)
+#   7) All Tools (installiert alle Pakete)
 #
-# Run as root!
+# Skript als root ausführen!
 
-# Ensure the script runs as root
+# Prüfe, ob das Skript als root läuft
 if [ "$EUID" -ne 0 ]; then
-  echo "Please run as root (sudo su or sudo bash)"
+  echo "Bitte als root ausführen (sudo su oder sudo bash)"
   exit 1
 fi
 
-# Update and upgrade the system
-echo "Updating system..."
+# System aktualisieren und upgraden
+echo "System wird aktualisiert..."
 apt update && apt upgrade -y
 
-# Define package groups
+# Definiere die Paketgruppen
 
 cli_tools=(
   btop htop mc wget curl git unzip tar zip nano vim tmux screen software-properties-common
@@ -48,25 +49,50 @@ backup_tools=(
   borgbackup restic duplicity
 )
 
-# Display selection menu
-echo "Select the categories of tools to install:"
+# Zusätzliche Tools (über 200 Pakete, „good to have“)
+misc_tools=(
+  apt-file aptitude autojump bc bleachbit cmatrix colordiff cowsay deborphan dconf-editor
+  dos2unix dmidecode e2fsprogs exiftool figlet fortune foomatic-db-complete g++ gcc gimp
+  gnome-disk-utility gnupg gparted graphviz imagemagick inxi iptables iptables-persistent
+  jwhois keepassxc kmod leafpad less lnav lsscsi lynx make man-db mdadm meld mmv netcat
+  netcat-openbsd nethogs ntp ntpdate ntfs-3g okular openjdk-11-jdk openjdk-8-jdk openssl
+  openssh-client os-prober p7zip-full pbzip2 perl php php-cli php-curl php-mbstring pkg-config
+  plocate postgresql-client powerline proot pulseaudio qemu qemu-kvm qt5-default rclone remmina
+  rlwrap rsnapshot screenfetch scrot sed silversearcher-ag smartmontools smbclient sox sqlmap
+  sudo sysbench tesseract-ocr terminator transmission-cli unrar upower usbutils vlc w3m watch
+  weechat wput xclip xdg-utils xinput xrandr xscreensaver xserver-xorg youtube-dl zathura acpi
+  arping bmon bridge-utils cbm cgroup-tools conky cpufrequtils dstat ethtool fcitx ffmpegthumbnailer
+  fping gawk gh git-lfs gnome-terminal golang grsync gtkhash hddtemp iotop iperf irssi jnettop jq
+  keepalived krename libcurl4-openssl-dev libxml2-utils lynis maven mediainfo minicom mlocate
+  moreutils ncmpcpp nco nload nodejs npm ntfs-config numlockx openconnect pavucontrol parcellite
+  pass pcmciautils perl-modules phpmyadmin pidgin pkexec plank poppler-utils powertop pulsemixer
+  python-is-python3 qbittorrent qpdf qutebrowser r-base rdesktop realpath simple-scan slurm
+  speedcrunch sqlite3 stacer subversion synaptic sysvbanner tilda tmuxinator totem transmission-gtk
+  ttf-mscorefonts-installer unison vagrant valgrind virtualbox virt-manager watchdog wine
+  winetricks xarchiver xdotool xfce4-terminal xsel xserver-xorg-input-all xserver-xorg-video-all
+  yelp zenity zram-tools apt-transport-https libpq-dev python3-dev python3-setuptools python3-wheel
+)
+
+# Anzeige des Auswahlmenüs
+echo "Wähle die Kategorien der zu installierenden Tools aus:"
 echo "  1) CLI & Utilities"
 echo "  2) Network Tools"
 echo "  3) Security & Monitoring Tools"
 echo "  4) Development Tools"
 echo "  5) Backup Tools"
-echo "  6) All Tools"
-read -p "Enter your choices as comma-separated numbers (e.g. 1,3,5): " choices
+echo "  6) Additional Tools (200+ extra)"
+echo "  7) All Tools (alle Kategorien)"
+read -p "Gib deine Auswahl als komma-getrennte Zahlen ein (z.B. 1,3,5): " choices
 
-# Convert user input to an array (splitting on commas)
+# Umwandlung der Benutzereingabe in ein Array (Trennung bei Kommas)
 IFS=',' read -ra selected <<< "$choices"
 
-# Initialize empty array for selected packages
+# Initialisiere leeres Array für die zu installierenden Pakete
 packages=()
 
-# Process each selected option
+# Verarbeite jede ausgewählte Option
 for choice in "${selected[@]}"; do
-  # Remove any surrounding whitespace
+  # Entferne führende und nachfolgende Leerzeichen
   choice=$(echo "$choice" | xargs)
   case "$choice" in
     1)
@@ -85,29 +111,33 @@ for choice in "${selected[@]}"; do
       packages+=("${backup_tools[@]}")
       ;;
     6)
-      packages+=("${cli_tools[@]}" "${network_tools[@]}" "${security_tools[@]}" "${development_tools[@]}" "${backup_tools[@]}")
-      # No need to check further choices if "All" is selected.
+      packages+=("${misc_tools[@]}")
+      ;;
+    7)
+      packages+=("${cli_tools[@]}" "${network_tools[@]}" "${security_tools[@]}" \
+                   "${development_tools[@]}" "${backup_tools[@]}" "${misc_tools[@]}")
+      # Bei "All Tools" ist keine weitere Verarbeitung notwendig.
       break
       ;;
     *)
-      echo "Invalid choice: $choice"
+      echo "Ungültige Auswahl: $choice"
       ;;
   esac
 done
 
-# Remove duplicate package names by sorting uniquely
+# Entferne doppelte Paketnamen durch sortieren und unique
 unique_packages=($(printf "%s\n" "${packages[@]}" | sort -u))
 
-# Install selected packages
-echo "Installing selected packages..."
+# Installiere die ausgewählten Pakete
+echo "Installiere die ausgewählten Pakete..."
 apt install -y "${unique_packages[@]}"
 
-# Clean up
-echo "Cleaning up..."
+# Aufräumen
+echo "Aufräumen..."
 apt autoremove -y && apt autoclean -y
 
-# Enable essential services (SSH and fail2ban)
-echo "Enabling essential services..."
+# Aktiviere essentielle Dienste (SSH und fail2ban)
+echo "Aktiviere essentielle Dienste..."
 systemctl enable --now ssh fail2ban
 
-echo "Setup complete! A reboot is recommended."
+echo "Setup abgeschlossen! Ein Neustart wird empfohlen."
