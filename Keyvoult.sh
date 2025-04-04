@@ -1,7 +1,7 @@
 #!/bin/bash
 # Dieses Skript richtet eine einfache KeyVault Website auf einem Debian Server ein.
-# Es installiert Nginx, erstellt das Web-Verzeichnis, legt eine Beispiel‑index.html an
-# und richtet einen Nginx‑Serverblock ein. Optional wird auch Let’s Encrypt (Certbot) für SSL angeboten.
+# Es installiert Nginx, erstellt das Web-Verzeichnis, legt eine Beispiel-index.html an
+# und richtet einen Nginx-Serverblock ein. Optional wird auch Let’s Encrypt (Certbot) für SSL angeboten.
 
 # Bei Fehler sofort abbrechen
 set -e
@@ -12,13 +12,13 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-# Überprüfen, ob ein Domainname als Parameter übergeben wurde
-if [ -z "$1" ]; then
-  echo "Usage: $0 <DOMAIN_NAME>"
+# Domainnamen interaktiv abfragen
+read -p "Bitte gib den Domainnamen ein (z.B. example.com): " DOMAIN
+if [ -z "$DOMAIN" ]; then
+  echo "Es wurde kein Domainname eingegeben. Abbruch."
   exit 1
 fi
 
-DOMAIN="$1"
 WEB_DIR="/var/www/$DOMAIN"
 
 echo "Aktualisiere die Paketlisten..."
@@ -29,7 +29,7 @@ apt install -y nginx certbot python3-certbot-nginx
 
 echo "Erstelle das Web-Verzeichnis unter $WEB_DIR..."
 mkdir -p "$WEB_DIR"
-# Setze Eigentümer (hier wird der aktuelle User gesetzt, passe das ggf. an)
+# Setze den Eigentümer auf den aktuellen SUDO_USER, passe dies ggf. an
 chown -R "$SUDO_USER":"$SUDO_USER" "$WEB_DIR"
 
 echo "Erstelle eine Beispiel-index.html..."
